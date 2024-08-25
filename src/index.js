@@ -12,6 +12,8 @@ const contentLoaders = {
   contact: loadContact,
 };
 
+const basePath = "/restaurant_page";
+
 function setActiveButton(button) {
   const buttons = document.querySelectorAll("nav button");
   buttons.forEach((btn) => btn.classList.remove("active"));
@@ -29,7 +31,8 @@ function loadContent(contentLoader, tabName) {
   content.appendChild(contentLoader());
 
   // Update URL and add to history
-  history.pushState({ tab: tabName }, "", `/${tabName}`);
+  const newPath = `${basePath}/${tabName}`; // Modify this line
+  history.pushState({ tab: tabName }, "", newPath);
 
   // Update active button
   setActiveButton(document.getElementById(tabName));
