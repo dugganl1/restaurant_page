@@ -31,7 +31,12 @@ function loadContent(contentLoader, tabName) {
   content.appendChild(contentLoader());
 
   // Update URL and add to history
-  const newPath = `${basePath}/${tabName}`; // Modify this line
+  let newPath;
+  if (tabName === "home") {
+    newPath = `${basePath}/`; // For home, just use the base path
+  } else {
+    newPath = `${basePath}/${tabName}`;
+  }
   history.pushState({ tab: tabName }, "", newPath);
 
   // Update active button
@@ -59,9 +64,15 @@ window.addEventListener("popstate", function (event) {
 
 // Initial load based on URL
 function initialLoad() {
-  const path = window.location.pathname.replace(/^\//, "") || "home";
-  const contentLoader = contentLoaders[path] || loadHome;
-  loadContent(contentLoader, path);
+  const path = window.location.pathname.replace(basePath, "").replace(/^\//, "");
+  let tab;
+  if (path === "" || path === "restaurant_page/") {
+    tab = "home";
+  } else {
+    tab = path;
+  }
+  const contentLoader = contentLoaders[tab] || loadHome;
+  loadContent(contentLoader, tab);
 }
 
 // DOMContentLoaded event listener
