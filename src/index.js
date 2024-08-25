@@ -4,6 +4,13 @@
 import { loadHome } from "./home.js";
 import { loadMenu } from "./menu.js";
 import { loadContact } from "./contact.js";
+import "./styles.css";
+
+const contentLoaders = {
+  home: loadHome,
+  menu: loadMenu,
+  contact: loadContact,
+};
 
 function setActiveButton(button) {
   const buttons = document.querySelectorAll("nav button");
@@ -16,30 +23,46 @@ function clearContent() {
   content.innerHTML = "";
 }
 
-function loadContent(contentLoader) {
+function loadContent(contentLoader, tabName) {
   clearContent();
   const content = document.getElementById("content");
   content.appendChild(contentLoader());
+
+  // Update URL and add to history
+  history.pushState({ tab: tabName }, "", `/${tabName}`);
+
+  // Update active button
+  setActiveButton(document.getElementById(tabName));
 }
 
+// Event listeners for navigation buttons
+function setupNavigation() {
+  document.getElementById("home").addEventListener("click", () => loadContent(loadHome, "home"));
+  document.getElementById("menu").addEventListener("click", () => loadContent(loadMenu, "menu"));
+  document
+    .getElementById("contact")
+    .addEventListener("click", () => loadContent(loadContact, "contact"));
+}
+
+// Handle popstate (back/forward navigation)
+window.addEventListener("popstate", function (event) {
+  if (event.state && event.state.tab) {
+    const contentLoader = contentLoaders[event.state.tab];
+    if (contentLoader) {
+      loadContent(contentLoader, event.state.tab);
+    }
+  }
+});
+
+// Initial load based on URL
+function initialLoad() {
+  const path = window.location.pathname.replace(/^\//, "") || "home";
+  const contentLoader = contentLoaders[path] || loadHome;
+  loadContent(contentLoader, path);
+}
+
+// DOMContentLoaded event listener
 document.addEventListener("DOMContentLoaded", () => {
-  // Load home page by default
-  loadContent(loadHome);
-  setActiveButton(document.getElementById("home"));
-
-  // Add event listeners to buttons
-  document.getElementById("home").addEventListener("click", (e) => {
-    loadContent(loadHome);
-    setActiveButton(e.target);
-  });
-
-  document.getElementById("menu").addEventListener("click", (e) => {
-    loadContent(loadMenu);
-    setActiveButton(e.target);
-  });
-
-  document.getElementById("contact").addEventListener("click", (e) => {
-    loadContent(loadContact);
-    setActiveButton(e.target);
-  });
+  setupNavigation();
+  initialLoad();
 });

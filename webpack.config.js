@@ -3,12 +3,13 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  mode: "development",
+  mode: "production", // Changed this to "production" from "development" for the build
   entry: "./src/index.js",
   output: {
     filename: "main.js",
     path: path.resolve(__dirname, "dist"),
     clean: true,
+    publicPath: "/restaurant_page/",
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -30,5 +31,14 @@ module.exports = {
         type: "asset/resource",
       },
     ],
+  },
+  devServer: {
+    static: {
+      directory: path.join(__dirname, "dist"),
+    },
+    historyApiFallback: true,
+    compress: true,
+    port: 8080,
+    open: true,
   },
 };
